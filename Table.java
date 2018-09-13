@@ -5,8 +5,8 @@ import java.text.DecimalFormat;
 
 public class Table {
 
-	private final int MAXREG = 80 ;
-	private final int MAXFIE = 80 ;
+	private final int MAXREG = 80 ;  // If you need more registers, increase it here.
+	private final int MAXFIE = 80 ;  // If you need more fields(columns), increase it here.
 	private String[][] table = new String[MAXREG][MAXFIE]; // [registry][field]
 	private int size = 0;
 	private final String DELETED = new String((char)1+"");
@@ -104,7 +104,8 @@ public class Table {
 		}
 	}
 	
-	/** Delete all registers where fieldPosition is equal to a valueParameter */
+	/** LogicDelete all registers where fieldPosition is equal to a valueParameter. 
+	    To force a physical deletion, use the clone() after delete(). */
 	public void deleteWhere( int numField , String value ) throws Exception {
 		try {
 			for (int r=0; r<this.size(); r++) {
