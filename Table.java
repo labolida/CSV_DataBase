@@ -5,8 +5,8 @@ import java.text.DecimalFormat;
 
 public class Table {
 
-	private final int MAXREG = 80 ;  // If you need more registers, increase it here.
-	private final int MAXFIE = 80 ;  // If you need more fields(columns), increase it here.
+	private final int MAXREG = 800 ;  // If you need more registers, increase it here.
+	private final int MAXFIE = 80  ;  // If you need more fields(columns), increase it here.
 	private String[][] table = new String[MAXREG][MAXFIE]; // [registry][field]
 	private int size = 0;
 	private final String DELETED = new String((char)1+"");
