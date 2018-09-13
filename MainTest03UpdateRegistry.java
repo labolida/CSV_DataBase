@@ -23,6 +23,8 @@ public class MainTest03UpdateRegistry {
 			tableCustomers.setRegistry("999;Leonardo;MyAddress;MyEmail;".split(";"));
 			
 			tableCustomers.dump("Customers");                    // view original table
+			
+			tableCustomers.saveToCsvFile("Customers2.csv");
 		} 
 		catch (Exception e) {
 			System.out.println( "Error at MainTest:" + e.getMessage() );

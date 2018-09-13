@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 
 public class Table {
@@ -27,6 +28,25 @@ public class Table {
 			throw new Exception("Error at loadFromCsvFile():" + e.getMessage() );
 		}
 	}
+	/** SAVE TO FILE */
+	public void saveToCsvFile( String filename) throws Exception {
+		try {
+			StringBuffer buff = new StringBuffer();
+			for (int r=0; r<size; r++) {
+				for (int f=0; f<table[r].length; f++) {
+					buff.append( table[r][f] + ";" );
+				}
+				buff.append("\n");
+			}
+			File file = new File(filename);
+			FileOutputStream fos = new FileOutputStream( file );
+			fos.write(new String(buff).getBytes());
+			fos.close();
+		} 
+		catch (Exception e) {
+			throw new Exception("Error at saveToCsvFile():" + e.getMessage() );
+		}
+	}	
 	
 	/** Size **/
 	public int size() {
