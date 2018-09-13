@@ -9,6 +9,8 @@ public class Table {
 	private final int MAXFIE = 80 ;
 	private String[][] table = new String[MAXREG][MAXFIE]; // [registry][field]
 	private int size = 0;
+	private final String DELETED = new String((char)1+"");
+	
 	
 	/** LOAD FROM FILE */
 	public void loadFromCsvFile( String filename) throws Exception {
@@ -86,7 +88,7 @@ public class Table {
 		this.size++;
 	}	
 	
-	/** Return a SubTable (ResultSet) with all registries where fieldPosition is equal to a valueParameter */
+	/** Return a SubTable (ResultSet) with all registers where fieldPosition is equal to a valueParameter */
 	public Table selectWhere( int numField , String value ) throws Exception {
 		try {
 			Table resultset = new Table();
@@ -98,8 +100,37 @@ public class Table {
 			return resultset;
 		}
 		catch (Exception e) {
-			throw new Exception("Error at getWhere():" + e.getMessage());
+			throw new Exception("Error at selectWhere():" + e.getMessage());
 		}
+	}
+	
+	/** Delete all registers where fieldPosition is equal to a valueParameter */
+	public void deleteWhere( int numField , String value ) throws Exception {
+		try {
+			for (int r=0; r<this.size(); r++) {
+				if ( table[r][numField].equals(value) ) {
+					table[r][0]=DELETED;
+				}
+			}
+		}
+		catch (Exception e) {
+			throw new Exception("Error at deleteWhere():" + e.getMessage());
+		}
+	}
+	
+	/** Clone this table **/
+	public Table clone(){
+		Table clone = new Table();
+		for (int r=0; r<size; r++) {
+			String registry = new String();
+			for (int f=0; f<table[r].length; f++) {
+				registry=registry+table[r][f]+";" ;
+			}
+			if (table[r][0]!=DELETED) {
+				clone.setRegistry(registry.split(";"));
+			}
+		}
+		return clone;
 	}
 	
 	/** DEBUG: HOW ALL CONTENT **/

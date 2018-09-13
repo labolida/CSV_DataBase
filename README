@@ -229,6 +229,70 @@
 		999 | Leonardo | MyAddress | MyEmail | 
 
 
+		
+		
+		
+ Let's delete a registry.
+ This example presents how to do a LOGICAL DELETION and then 
+ CLONE the table to force to remove the desired regitry.
+ 
+		public class MainTest04Delete {
+			
+			public static void main(String[] args) {
+				try {
+					Table tableCustomers = new Table();
+					tableCustomers.loadFromCsvFile("Customers.csv");
+					
+					tableCustomers.dump("Original Customers");        // view original table
+
+					tableCustomers.deleteWhere(1, "Bob");    // Note: it is marked as a deleted. (Logical Deletion)
+					
+					tableCustomers.dump("Customers with logical delete");        // view original table
+					
+					Table customers3 = tableCustomers.clone();               // Eliminates the registry
+					
+					customers3.dump("Customer3 without de deleted registry");
+
+				} 
+				catch (Exception e) {
+					System.out.println( "Error at MainTest:" + e.getMessage() );
+				}
+			}
+		}
+		
+	OUTPUT
+
+		DUMPING Original Customers
+		ID | NAME | ADDRESS | EMAIL | 
+		005 | Bill | AddAv05 | bill@domain.com | 
+		009 | Jobs | AddAv09 | jobs@domain.com | 
+		044 | Bob | AddAv44 | bob@domain.com | 
+		021 | Alice | AddAv21 | alice@domain.com | 
+
+
+		DUMPING Customers with logical delete
+		ID | NAME | ADDRESS | EMAIL | 
+		005 | Bill | AddAv05 | bill@domain.com | 
+		009 | Jobs | AddAv09 | jobs@domain.com | 
+		 | Bob | AddAv44 | bob@domain.com | 
+		021 | Alice | AddAv21 | alice@domain.com | 
+
+
+		DUMPING Customer3 without de deleted registry
+		ID | NAME | ADDRESS | EMAIL | 
+		005 | Bill | AddAv05 | bill@domain.com | 
+		009 | Jobs | AddAv09 | jobs@domain.com | 
+		021 | Alice | AddAv21 | alice@domain.com | 
+
+
+		
+		
+		
+		
+		
+		
+		
+		
  I hope you enjoy it.
  Leo.
 		
