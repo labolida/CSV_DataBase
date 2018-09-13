@@ -5,17 +5,24 @@
  -----------------------------------------------------------------------------
  September 13th, 2018 - by http://www.leonardo.labolida.com
  -----------------------------------------------------------------------------
- 
  The main goal is to have a very SIMPLE and FAST library
  to work with CSV files.
  
  Sometimes big frameworks, famous database system, etc.. is too much
  when you just need to build a simple soluction to a friend 
  and have it done next day.
-
+ -----------------------------------------------------------------------------
+ 
  This project is OPEN SOURCE and very easy to debug.
  
+ There is no lib or jar or anything like that. 
+ You just need to copy the "Table.java" to your project.
+ 
  -----------------------------------------------------------------------------
+ 
+ 
+ 
+ 
  
  How to use it:
  
