@@ -1,0 +1,236 @@
+ -----------------------------------------------------------------------------
+ CSV DataBase    
+ Very Simple Query Engine for CSV files (Comma Separated Values).
+ Developed in Java. It works in all versions.
+ -----------------------------------------------------------------------------
+ September 13th, 2018 - by http://www.leonardo.labolida.com
+ -----------------------------------------------------------------------------
+ 
+ The main goal is to have a very SIMPLE and FAST library
+ to work with CSV files.
+ 
+ Sometimes big frameworks, famous database system, etc.. is too much
+ when you just need to build a simple soluction to a friend 
+ and have it done next day.
+
+ This project is OPEN SOURCE and very easy to debug.
+ 
+ -----------------------------------------------------------------------------
+ 
+ How to use it:
+ 
+ First, let's take a look at our CSV files:
+ 
+	 Customer.csv
+		ID;NAME;ADDRESS;EMAIL;
+		005;Bill;AddAv05;bill@domain.com;
+		009;Jobs;AddAv09;jobs@domain.com;
+		044;Bob;AddAv44;bob@domain.com;
+		021;Alice;AddAv21;alice@domain.com;
+		
+	 Products.csv
+		ID;NAME;CODE;DESCRIPTION;PRICE;
+		04;Prod04;P004;description;4,44;
+		01;Prod01;P004;description;1,11;
+		88;Prod88;P004;description;8,88;
+		33;Prod33;P004;description;2,22;
+
+	Relationship.csv
+		IDCUSTOMER;IDPRODUCT;AMOUNT;
+		005;04;01;
+		009;01;01;
+		044;88;01;
+		021;33;03;
+		005;01;01;
+		009;04;02;
+		044;33;01;
+		021;88;04;
+	
+ This is the typical example of Customer buying Products.
+
+ 
+ Let's SELECT what Customers are Buying:
+	
+		public class MainTest01SimpleQuery {
+			
+			public static void main(String[] args) {
+				try {
+					Table tableCustomers = new Table();                         // Creating an empty table
+					Table tableProducts = new Table();
+					Table tableRelationship = new Table();
+					
+					tableCustomers.loadFromCsvFile("Customers.csv");            //  loading from csv file
+					tableProducts.loadFromCsvFile("Products.csv");
+					tableRelationship.loadFromCsvFile("Relationship.csv");
+					
+					tableCustomers.dump("Customers");                           // debug: print all table content
+					tableProducts.dump("Products");
+					tableRelationship.dump("Relationship");
+					
+					for (int r=0; r<tableRelationship.size();r++) {             // Loop on each registry of the relationship table
+						String customerID = tableRelationship.getValue(r, 0);
+						String productID  = tableRelationship.getValue(r, 1);
+						
+						// Get a new TableResultSet of a query
+						Table queryCustomer = tableCustomers.selectWhere(0, customerID); // select * from customers where ID=customerID
+						Table queryProduct  = tableProducts.selectWhere(0, productID);   // select * from products  where ID=productID
+						
+						String customerName = queryCustomer.getValue(0, 1);
+						String productName = queryProduct.getValue(0, 1);
+						
+						System.out.println( "The customer:" + customerName + " is buying the product:" + productName );
+					}
+				} 
+				catch (Exception e) {
+					System.out.println( "Error at MainTest:" + e.getMessage() );
+				}
+			}
+		}
+		
+	OUTPUT
+		The customer:Bill is buying the product:Prod04
+		The customer:Jobs is buying the product:Prod01
+		The customer:Bob is buying the product:Prod88
+		The customer:Alice is buying the product:Prod33
+		The customer:Bill is buying the product:Prod01
+		The customer:Jobs is buying the product:Prod04
+		The customer:Bob is buying the product:Prod33
+		The customer:Alice is buying the product:Prod88
+		
+		
+		
+		
+		
+		
+ Let's print a nice report GROUPING BY Customer 
+ and presenting how much they are going to pay.
+		
+		public class MainTest02CalcQuery {
+			
+			public static void main(String[] args) {
+				try {
+					Table tableCustomers = new Table();                         // Creating an empty table
+					Table tableProducts = new Table();
+					Table tableRelationship = new Table();
+					
+					tableCustomers.loadFromCsvFile("Customers.csv");            //  loading from csv file
+					tableProducts.loadFromCsvFile("Products.csv");
+					tableRelationship.loadFromCsvFile("Relationship.csv");
+					
+					tableCustomers.dump("Customers");                           // debug: print all table content
+					tableProducts.dump("Products");
+					tableRelationship.dump("Relationship");
+					
+					for (int c=1; c<tableCustomers.size();c++) {               // Loop on Customers
+						String customerID   = tableCustomers.getValue(c, 0);
+						String customerName = tableCustomers.getValue(c, 1);
+						System.out.println( "Customer:" + customerName );
+						
+						double total = 0;
+						Table queryRelationship = tableRelationship.selectWhere(0, customerID); // select from relations where ID=customerID
+						for (int r=0; r<queryRelationship.size(); r++){
+							String productID = queryRelationship.getValue(r, 1);
+							int amount = queryRelationship.getIntValue(r, 2);
+							
+							Table queryProduct  = tableProducts.selectWhere(0, productID);   // select from products  where ID=productID
+							for (int p=0; p<queryProduct.size(); p++){
+								String productName = queryProduct.getValue(0, 1);
+								Double productPrice = queryProduct.getDoubleValue(0, 4);
+								double subTotal = productPrice * amount;
+								total=total+subTotal;
+								System.out.println( "  Is buying "+amount+" of the product:" + productName + " price:"+productPrice + " subTotal:"+subTotal );
+							}
+						}
+						System.out.println("     TOTAL:" + Table.getMoneyValue(total) );
+					}
+				} 
+				catch (Exception e) {
+					System.out.println( "Error at MainTest:" + e.getMessage() );
+				}
+			}
+		}
+
+	OUTPUT	
+		Customer:Bill
+		  Is buying 1 of the product:Prod04 price:4.44 subTotal:4.44
+		  Is buying 1 of the product:Prod01 price:1.11 subTotal:1.11
+			 TOTAL:5,55
+		Customer:Jobs
+		  Is buying 1 of the product:Prod01 price:1.11 subTotal:1.11
+		  Is buying 2 of the product:Prod04 price:4.44 subTotal:8.88
+			 TOTAL:9,99
+		Customer:Bob
+		  Is buying 1 of the product:Prod88 price:8.88 subTotal:8.88
+		  Is buying 1 of the product:Prod33 price:2.22 subTotal:2.22
+			 TOTAL:11,10
+		Customer:Alice
+		  Is buying 3 of the product:Prod33 price:2.22 subTotal:6.66
+		  Is buying 4 of the product:Prod88 price:8.88 subTotal:35.52
+			 TOTAL:42,18
+
+			 
+		
+
+	Now, let's UPDATE a value of an existing registry and then 
+	we are going to INSERT a new registry:
+		
+		public class MainTest03UpdateRegistry {
+			
+			public static void main(String[] args) {
+				try {
+					Table tableCustomers = new Table();
+					tableCustomers.loadFromCsvFile("Customers.csv");
+					tableCustomers.dump("Customers");                    // view original table
+
+					
+					/* UPDATE */
+					Table query = tableCustomers.selectWhere(1, "Bill"); // Pointer reference
+					query.setValue(0, 2, "Addrrss Street 45678");        // update a field from an existing registry
+					
+					tableCustomers.dump("Customers");                    // view original table
+					
+					
+					/* INSERT */
+					tableCustomers.setRegistry("999;Leonardo;MyAddress;MyEmail;".split(";"));
+					
+					tableCustomers.dump("Customers");                    // view original table
+				} 
+				catch (Exception e) {
+					System.out.println( "Error at MainTest:" + e.getMessage() );
+				}
+			}
+		}
+			 
+			 
+	OUTPUT
+
+		DUMPING Customers
+		ID | NAME | ADDRESS | EMAIL | 
+		005 | Bill | AddAv05 | bill@domain.com | 
+		009 | Jobs | AddAv09 | jobs@domain.com | 
+		044 | Bob | AddAv44 | bob@domain.com | 
+		021 | Alice | AddAv21 | alice@domain.com | 
+
+
+		DUMPING Customers
+		ID | NAME | ADDRESS | EMAIL | 
+		005 | Bill | Addrrss Street 45678 | bill@domain.com | 
+		009 | Jobs | AddAv09 | jobs@domain.com | 
+		044 | Bob | AddAv44 | bob@domain.com | 
+		021 | Alice | AddAv21 | alice@domain.com | 
+
+
+		DUMPING Customers
+		ID | NAME | ADDRESS | EMAIL | 
+		005 | Bill | Addrrss Street 45678 | bill@domain.com | 
+		009 | Jobs | AddAv09 | jobs@domain.com | 
+		044 | Bob | AddAv44 | bob@domain.com | 
+		021 | Alice | AddAv21 | alice@domain.com | 
+		999 | Leonardo | MyAddress | MyEmail | 
+
+
+ I hope you enjoy it.
+ Leo.
+		
+		
+		
